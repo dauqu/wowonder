@@ -6,32 +6,28 @@ ENV TZ=Asia/Kolkata \
 #Update and upgrade 
 RUN apt-get update && apt-get upgrade -y
 
-#install nginx and php and 
-RUN apt install nginx -y
- 
-#Install php
-RUN apt-get install php-fpm php-mysql -y
+#install
+RUN apt-get install curl php apache2 mysql-server php-mysqli php-mysql php-gd php-curl php-mbstring php-soap php-intl php-zip -y
 
-#Install mysql
-RUN apt-get install mysql-server -y
-
-#Install ufw    
+#Install ufw
 RUN apt-get install ufw -y
 
-#Firewall allow
-RUN ufw allow 'Nginx HTTP'
+#Firewall allow 
+RUN ufw allow 'Apache'
 
 #Set servername
 RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
+RUN chown -R www-data:www-data /var/www/html && \
+    chmod -R 775 /var/www/html
+    
 #Remove default index.html
-# RUN rm /var/www/html/index.html
+RUN rm /var/www/html/index.html
 
 COPY . /var/www/html
 
 #Expose port 80
 EXPOSE 80
 
-#Start nginx
-CMD ["nginx", "-g", "daemon off;"]
-
+#Start apache2
+CMD ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]
